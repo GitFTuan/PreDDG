@@ -1,6 +1,7 @@
 # PreDDG
 
-## 环境准备
+## 📦 Environment Setup
+We recommend creating a dedicated [conda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) environment:
 
 ```bash
   conda create -n PreDDG python=3.12
@@ -10,80 +11,88 @@
   pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.5.0+cu118.html
   pip install tensorboard tensorboardX pytorch_lightning 
   pip install torch_geometric fair-esm
-  pip install biopython MDAnalysis mdtraj 
+  pip install biopython
 ```
+⚠️ Please ensure that the CUDA version matches your PyTorch and torch-geometric installation. For details, refer to the [installation guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html)。
 
-## 数据准备
+## 📂 Data Preparation
 
-### 数据集下载
+### Datasets
 
-cDNA, PTMul数据集可以从[这里](https://github.com/jozhang97/MutateEverything)下载。DMS数据集可以从[Zenodo (Dieckhaus & Kuhlman, 2024)](https://zenodo.org/records/13345274)下载。
 
-### 数据组织形式
+| Dataset  | Download Link                                                                               |
+|----------|--------------------------------------------------------------------------------------|
+| cDNA     | https://github.com/jozhang97/MutateEverything/                                       |
+| cDNA2    | https://github.com/jozhang97/MutateEverything/                                       |
+| PTMul-NR | https://ddgemb.biocomp.unibo.it/datasets/                                            |
+| M28      | https://github.com/GenScript-IBDPE/UniMutStab/tree/main/Dataset/Independent/multiple |
+| M38      | https://github.com/GenScript-IBDPE/UniMutStab/tree/main/Dataset/Independent/multiple |
 
-数据集的文件夹结构如下：
+Datasets should be placed under `./data/dataset/` directory. The folder structure should be as follows:
 
 ```
 data/
     dataset/
-        ptmul/
+        M28/
             mutations/
-                ptmul.csv
+                M28.csv
 ```
 
-### 数据集预处理
 
-#### 第一步：获取野生型蛋白质的PDB文件
+### ISM Model Preparation
 
-下载各数据集中的野生型PDB文件，可以使用以下命令：
+Download [ISM-650M-UC30PDB](https://huggingface.co/jozhang97/ism_t33_650M_uc30pdb)，and place it in `./data/ism/ism_t33_650M_uc30pdb/` directory:
+```
+data/
+    ism/
+        ism_t33_650M_uc30pdb/
+            config.json
+            gitattributes
+            ism_t33_650M_uc30pdb.pth
+            model.safetensors
+            special_tokens_map.json
+            tokenizer_config.json
+            vocab.txt
+```
+
+## 🚀 Running PreDDG for Prediction
+Example: predicting on M28 dataset. Input files should be in .csv format with one of the following formats:
+
+**Format 1** (with both wild-type and mutant sequences):
+
+| pdb_id | wt_seq | mut_info | mut_seq |
+|--------|--------|--------|--------|
+
+
+**Format 2** (only mutation info provided):
+
+| pdb_id | wt_seq | mut_info |
+|--------|--------|--------|
+
+
+**Note:**
+ 1. `mut_info` follows the format `WT_POS_MUT`, e.g., `Y68R` means the 68th position changes from Y to R.
+ 2. Multiple mutations are separated by `:`, e.g., `Y68R:A120V`.
+ 3. `mut_seq` is optional. If not provided, it will be computed based on `wt_seq` and `mut_info`.
 
 ```bash
 cd PreDDG
-
+python predict.py --test_name='M28' --device='cuda:0'
 ```
+Predictions are saved under `./data/dataset/M28/predictions/`. Example output:
 
-#### 第二步：获取PSSM
+| pdb_id | wt_seq | mut_info | mut_seq | preddg |
+|--------|--------|--------|--------|--------|
 
-##### 准备blast及uniref90数据库
+For more details, please refer to the paper and source code.
 
-```bash
-cd PreDDG/data/
-conda install -c bioconda blast
-wget ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz
-gzip -d uniref90.fasta.gz
-makeblastdb -in uniref90.fasta -parse_seqids -hash_index -dbtype prot 
-```
-
-##### 进行序列比对
-
-如果想要对指定的fasta文件进行比对，并且将比对结果保存到指定的文件夹中，可以使用下面的命令：
-
-```bash
-cd PreDDG
-```
-
-如果只是对本文的数据集进行序列比对，可以使用下面的命令：
-
-```bash
-cd PreDDG
-
-```
-
-#### 第三步：从ISM中提取特征
-
-##### 准备ISM
-
-ISM的官方仓库可以从[这里](https://github.com/jozhang97/ism)进入，选择下载[ISM-650M-UC30PDB](https://huggingface.co/jozhang97/ism_t33_650M_uc30pdb)，并将其放置在`./data/ism/ism_t33_650M_uc30pdb/`目录下。
-
-##### 采用ISM提取特征
-
-```bash
-
-```
-
-## 训练模型
-
-```bash
-cd PreDDG
-python main.py
+## 📖 Citation
+If you find PreDDG useful, please cite our paper:
+```bibtex
+@article{
+  title={},
+  author={},
+  journal={},
+  year={}
+}
 ```
