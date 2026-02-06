@@ -81,7 +81,7 @@ python predict.py --test_name='M28' --device='cuda:0'
 ```
 Predictions are saved under `./data/dataset/M28/predictions/`. Example output:
 
-| pdb_id | wt_seq | mut_info | mut_seq | preddg |
+| pdb_id | wt_seq | mut_info | mut_seq | PreDDG |
 |--------|--------|--------|--------|--------|
 
 For more details, please refer to the paper and source code.
@@ -96,3 +96,4 @@ If you find PreDDG useful, please cite our paper:
   year={}
 }
 ```
+
