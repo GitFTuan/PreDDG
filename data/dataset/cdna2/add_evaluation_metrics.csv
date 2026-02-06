@@ -1,0 +1,7 @@
+Metric,Additive,Epistasis
+RMSE,1.0487,1.0389
+MAE,0.8393,0.8253
+Pearson_r,0.5321,0.5870
+Spearman_r,0.5318,0.5759
+Spearman_p,0.0000,0.0000
+R2,0.2832,0.3446
